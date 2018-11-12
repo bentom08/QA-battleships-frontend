@@ -8,9 +8,18 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = ({
-      user: 'ben'
+      user: ''
     })
   }
+
+  componentWillUpdate = () => {
+    axios.get("http://localhost:"+ port +"/battleships-1.0/api/battleships/getUsername").then((response) => {
+      this.setState({
+        user: response.data.username
+      })
+    })
+  }
+
   render() {
     return (
       <Login user = {this.state.user} />
