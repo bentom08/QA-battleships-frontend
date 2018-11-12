@@ -8,14 +8,14 @@ class Login extends Component {
     super(props);
     this.state = ({
       usernameMsg: '',
-      username: this.props.user,
+      user: this.props.user,
       signUp: false,
       loggedIn: false
     })
   }
 
   passwordsMatch = () => {
-    if (document.getElementById('password') === document.getElementById('reenter')) {
+    if (document.getElementById('password').value === document.getElementById('reenter').value) {
       return true;
     } else {
       return false;
@@ -29,6 +29,7 @@ class Login extends Component {
       })
       return;
     }
+    console.log('test')
     axios.get("http://localhost:"+ port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
 
       if (response.data.response === "false") {
@@ -37,13 +38,13 @@ class Login extends Component {
             username: document.getElementById('username').value,
             password: document.getElementById('password').value
           }
-        ).then(
+        ).then( () => {
+          this.props.updateUser(document.getElementById('username').value);
           this.setState({
             loggedIn: true,
             signUp: false
           })
-          //TODO store login in Parent via either cookie or back end
-        );
+        });
       } else {
         this.setState({
           usernameMsg: 'Username already taken'
@@ -67,10 +68,11 @@ class Login extends Component {
                 usernameMsg: 'Incorrect password'
               })
             } else {
+              this.props.updateUser(document.getElementById('username').value);
+              console.log(this.props.user + this.state.user)
               this.setState({
                 loggedIn: true
               })
-              //TODO store login in Parent via either cookie or back end
             }
           }
         );
@@ -89,10 +91,16 @@ class Login extends Component {
   }
 
   signOut = () => {
+    this.props.updateUser('');
     this.setState({
       loggedIn: false,
     })
-    //TODO remove login in Parent via either cookie or back end
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.setState({
+      user: nextProps.user
+    })
   }
 
   render() {
@@ -107,7 +115,7 @@ class Login extends Component {
     const signUp = <div>
       Username: <input id='username' type = 'text' placeholder='username...' /><br/><br/>
       Password: <input id ='password' type='password' placeholder='password...' /><br/><br/>
-      Re-enter Password: <input id ='reenter' type='password' placeholder='password...' /><br/><br/>
+      Re-enter Password: <input id ='reenter' type='password' /><br/><br/>
       <input id = 'signUp' value = 'Sign Up' type = 'button' onClick =  {this.signUp} /><br/>
       <p style={{color:'red'}}>{this.state.usernameMsg}</p>
     </div>
@@ -117,14 +125,14 @@ class Login extends Component {
       <input id = 'signOut' value = 'Sign Out' type = 'button' onClick =  {this.signOut} />
       </div>
 
-    if (this.state.signUp === "true") {
-      var display = signUp;
-    } else if (this.state.loggedIn === "true") {
-      var display = loggedIn;
+    var display;
+    if (this.state.signUp === true) {
+      display = signUp;
+    } else if (this.state.loggedIn === true) {
+      display = loggedIn;
     } else {
-      var display = login;
+      display = login;
     }
-
     return (
       display
     );
