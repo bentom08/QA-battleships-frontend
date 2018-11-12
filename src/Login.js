@@ -8,7 +8,8 @@ class Login extends Component {
       usernameMsg: '',
       user: this.props.user,
       signUp: false,
-      loggedIn: false
+      loggedIn: false,
+      changePassword: false
     })
   }
 
@@ -82,13 +83,33 @@ class Login extends Component {
 
   goToSignUp = () => {
     this.setState({
-      signUp: true
+      signUp: true,
+      changePassword: false,
+      loggedIn: false
     })
   }
 
   goToLogin = () => {
     this.setState({
+      signUp: false,
+      changePassword: false,
+      loggedIn: false
+    })
+  }
+
+  goToLoggedIn = () => {
+    this.setState({
+      loggedIn: true,
+      changePassword: false,
       signUp: false
+    })
+  }
+
+  goToChangePassword = () => {
+    this.setState({
+      loggedIn: false,
+      signUp: false,
+      changePassword: true
     })
   }
 
@@ -126,6 +147,15 @@ class Login extends Component {
     const loggedIn = <div>
       You are currently logged in as {this.state.user}<br/>
       <button id = 'signOut' onClick =  {this.signOut} >Sign Out</button>
+      <button id = 'changePassword' onClick = {this.goToChangePassword}>Change Password</button>
+      </div>
+
+    const changePassword = <div>
+      Username: <input id='oldPass' type = 'password' placeholder='old password...' /><br/><br/>
+      Password: <input id ='newPass' type='password' placeholder='new password...' /><br/><br/>
+      Re-enter Password: <input id ='reenter' type='password' placeholder='re-enter...'/><br/><br/>
+      <button id = 'change' onClick = {this.changePassword}>Change Password</button>
+      <button id = 'back' onClick =  {this.goToLoggedIn} >Go Back</button><br/>
       </div>
 
     var display;
@@ -133,6 +163,8 @@ class Login extends Component {
       display = signUp;
     } else if (this.state.loggedIn === true) {
       display = loggedIn;
+    } else if (this.state.changePassword === true) {
+      display = changePassword;
     } else {
       display = login;
     }
