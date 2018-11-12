@@ -94,17 +94,17 @@ class Login extends Component {
             password: document.getElementById('oldPass').value
         }
       ).then( (response) => {
-          if (response.data.response === false) {
+          if (response.data.response === "false") {
             this.setState({
               usernameMsg: 'Incorrect Password'
             })
           } else {
-            axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkPassword",
+            axios.put("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/updatePassword",
             {
               username: this.props.user,
               password: document.getElementById('password').value
             }).then( (response) => {
-              goToLoggedIn()
+              this.goToLoggedIn()
               this.setState({
                 usernameMsg: 'Password Updated!'
               })
@@ -153,6 +153,9 @@ class Login extends Component {
     this.props.updateUser('');
     this.setState({
       loggedIn: false,
+      signUp: false,
+      changePassword: false,
+      usernameMsg: ''
     })
   }
 
@@ -167,7 +170,7 @@ class Login extends Component {
       Username: <input id='username' type = 'text' placeholder='username...' /><br/><br/>
       Password: <input id ='password' type='password' placeholder='password...' /><br/><br/>
       <button id = 'login' onClick =  {this.login} >Log In</button>
-      <button id = 'signUp' onClick =  {this.goToSignUp} >Sign Up</button><br/>
+      <button id = 'signUp' onClick =  {this.goToSignUp} >Sign Up</button><br/><br/>
       <p style={{color:'red'}}>{this.state.usernameMsg}</p>
     </div>
 
@@ -176,14 +179,15 @@ class Login extends Component {
       Password: <input id ='password' type='password' placeholder='password...' /><br/><br/>
       Re-enter Password: <input id ='reenter' type='password' placeholder='re-enter...'/><br/><br/>
       <button id = 'signUp' onClick =  {this.signUp} >Sign Up</button>
-      <button id = 'back' onClick =  {this.goToLogin} >Back to Login</button><br/>
+      <button id = 'back' onClick =  {this.goToLogin} >Back to Login</button><br/><br/>
       <p style={{color:'red'}}>{this.state.usernameMsg}</p>
     </div>
 
     const loggedIn = <div>
       You are currently logged in as {this.state.user}<br/>
       <button id = 'signOut' onClick =  {this.signOut} >Sign Out</button>
-      <button id = 'changePassword' onClick = {this.goToChangePassword}>Change Password</button>
+      <button id = 'changePassword' onClick = {this.goToChangePassword}>Change Password</button><br/><br/>
+      {this.state.usernameMsg}
       </div>
 
     const changePassword = <div>
@@ -191,7 +195,8 @@ class Login extends Component {
       Password: <input id ='password' type='password' placeholder='new password...' /><br/><br/>
       Re-enter Password: <input id ='reenter' type='password' placeholder='re-enter...'/><br/><br/>
       <button id = 'change' onClick = {this.changePassword}>Change Password</button>
-      <button id = 'back' onClick =  {this.goToLoggedIn} >Go Back</button><br/>
+      <button id = 'back' onClick =  {this.goToLoggedIn} >Go Back</button><br/><br/>
+      {this.state.usernameMsg}
       </div>
 
     var display;
@@ -204,6 +209,7 @@ class Login extends Component {
     } else {
       display = login;
     }
+
     return (
       display
     );
