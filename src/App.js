@@ -19,7 +19,7 @@ class App extends Component {
 
   render() {
     return (
-      <Login user = {this.state.user} updateUser = {this.updateUser} />
+      <Login user = {this.state.user} updateUser = {this.updateUser} port = {port} />
     );
   }
 }

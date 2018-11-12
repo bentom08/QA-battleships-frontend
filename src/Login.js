@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 
-const port = 8081;
-
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -29,11 +27,10 @@ class Login extends Component {
       })
       return;
     }
-    console.log('test')
-    axios.get("http://localhost:"+ port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
+    axios.get("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
 
       if (response.data.response === "false") {
-        axios.post("http://localhost:"+ port +"/battleships-1.0/api/battleships/addUser",
+        axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/addUser",
           {
             username: document.getElementById('username').value,
             password: document.getElementById('password').value
@@ -54,10 +51,10 @@ class Login extends Component {
   }
 
   login = () => {
-    axios.get("http://localhost:"+ port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
+    axios.get("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
 
       if (response.data.response === "true") {
-        axios.post("http://localhost:"+ port +"/battleships-1.0/api/battleships/checkPassword",
+        axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkPassword",
           {
             username: document.getElementById('username').value,
             password: document.getElementById('password').value
@@ -69,7 +66,6 @@ class Login extends Component {
               })
             } else {
               this.props.updateUser(document.getElementById('username').value);
-              console.log(this.props.user + this.state.user)
               this.setState({
                 loggedIn: true
               })
@@ -90,6 +86,12 @@ class Login extends Component {
     })
   }
 
+  goToLogin = () => {
+    this.setState({
+      signUp: false
+    })
+  }
+
   signOut = () => {
     this.props.updateUser('');
     this.setState({
@@ -107,22 +109,23 @@ class Login extends Component {
     const login = <div>
       Username: <input id='username' type = 'text' placeholder='username...' /><br/><br/>
       Password: <input id ='password' type='password' placeholder='password...' /><br/><br/>
-      <input id = 'login' value = 'Log In' type = 'button' onClick =  {this.login} />
-      <input id = 'signUp' value = 'Sign Up' type = 'button' onClick =  {this.goToSignUp} /><br/>
+      <button id = 'login' onClick =  {this.login} >Log In</button>
+      <button id = 'signUp' onClick =  {this.goToSignUp} >Sign Up</button><br/>
       <p style={{color:'red'}}>{this.state.usernameMsg}</p>
     </div>
 
     const signUp = <div>
       Username: <input id='username' type = 'text' placeholder='username...' /><br/><br/>
       Password: <input id ='password' type='password' placeholder='password...' /><br/><br/>
-      Re-enter Password: <input id ='reenter' type='password' /><br/><br/>
-      <input id = 'signUp' value = 'Sign Up' type = 'button' onClick =  {this.signUp} /><br/>
+      Re-enter Password: <input id ='reenter' type='password' placeholder='re-enter...'/><br/><br/>
+      <button id = 'signUp' onClick =  {this.signUp} >Sign Up</button>
+      <button id = 'back' onClick =  {this.goToLogin} >Back to Login</button><br/>
       <p style={{color:'red'}}>{this.state.usernameMsg}</p>
     </div>
 
     const loggedIn = <div>
       You are currently logged in as {this.state.user}<br/>
-      <input id = 'signOut' value = 'Sign Out' type = 'button' onClick =  {this.signOut} />
+      <button id = 'signOut' onClick =  {this.signOut} >Sign Out</button>
       </div>
 
     var display;
