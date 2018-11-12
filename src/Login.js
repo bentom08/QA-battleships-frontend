@@ -81,11 +81,44 @@ class Login extends Component {
     })
   }
 
+  changePassword = () => {
+    if (!this.passwordsMatch()) {
+      this.setState({
+        usernameMsg: 'Passwords do not match'
+      })
+      return;
+    }
+    axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkPassword",
+        {
+            username: this.props.user,
+            password: document.getElementById('oldPass').value
+        }
+      ).then( (response) => {
+          if (response.data.response === false) {
+            this.setState({
+              usernameMsg: 'Incorrect Password'
+            })
+          } else {
+            axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkPassword",
+            {
+              username: this.props.user,
+              password: document.getElementById('password').value
+            }).then( (response) => {
+              goToLoggedIn()
+              this.setState({
+                usernameMsg: 'Password Updated!'
+              })
+            })
+          }
+    })
+  }
+
   goToSignUp = () => {
     this.setState({
       signUp: true,
       changePassword: false,
-      loggedIn: false
+      loggedIn: false,
+      usernameMsg: ''
     })
   }
 
@@ -93,7 +126,8 @@ class Login extends Component {
     this.setState({
       signUp: false,
       changePassword: false,
-      loggedIn: false
+      loggedIn: false,
+      usernameMsg: ''
     })
   }
 
@@ -101,7 +135,8 @@ class Login extends Component {
     this.setState({
       loggedIn: true,
       changePassword: false,
-      signUp: false
+      signUp: false,
+      usernameMsg: ''
     })
   }
 
@@ -109,7 +144,8 @@ class Login extends Component {
     this.setState({
       loggedIn: false,
       signUp: false,
-      changePassword: true
+      changePassword: true,
+      usernameMsg: ''
     })
   }
 
@@ -151,8 +187,8 @@ class Login extends Component {
       </div>
 
     const changePassword = <div>
-      Username: <input id='oldPass' type = 'password' placeholder='old password...' /><br/><br/>
-      Password: <input id ='newPass' type='password' placeholder='new password...' /><br/><br/>
+      Old Password: <input id='oldPass' type = 'password' placeholder='old password...' /><br/><br/>
+      Password: <input id ='password' type='password' placeholder='new password...' /><br/><br/>
       Re-enter Password: <input id ='reenter' type='password' placeholder='re-enter...'/><br/><br/>
       <button id = 'change' onClick = {this.changePassword}>Change Password</button>
       <button id = 'back' onClick =  {this.goToLoggedIn} >Go Back</button><br/>
