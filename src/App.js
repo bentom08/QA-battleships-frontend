@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Login from './Login.js'
+import Board from './Board.js'
 
-const port = 8080;
+const port = 8081;
 
 class App extends Component {
   constructor(props) {
@@ -19,7 +20,10 @@ class App extends Component {
 
   render() {
     return (
+      <div>
       <Login user = {this.state.user} updateUser = {this.updateUser} port = {port} />
+      <Board/>
+      </div>
     );
   }
 }
