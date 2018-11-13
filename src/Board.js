@@ -26,7 +26,7 @@ class Board extends Component {
     for (var i = 0; i < 10; i++) {
       for (var j = 0; j < 10; j++) {
         var newGrid = this.state.grid
-        newGrid[i][j] = {square: <Square onClick={this.hit} coords = {{x: i, y: j}} isHit = {false} shipHere = {false}/>, isHit: false, shipHere: false};
+        newGrid[i][j] = {square: <Square onClick={this.hit} coords = {{x: i, y: j}} isHit = {false} shipHere = {true}/>, shipHere: false};
         this.setState({
           grid: newGrid
         })
@@ -37,11 +37,11 @@ class Board extends Component {
 
   hit = (x, y) => {
     var newGrid = this.state.grid
-    newGrid[x][y].isHit = true
+    var shipHere = this.state.grid[x][y].shipHere
+    newGrid[x][y].square = <Square onClick = {this.hit} coords = {{x: x, y: y}} isHit = {true} shipHere = {shipHere} />
     this.setState({
       grid: newGrid
     })
-    console.log(this.state.grid[x][y].isHit)
   }
 
   render() {
