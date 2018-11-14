@@ -10,9 +10,9 @@ class Board extends Component {
 
     var grid = [];
 
-    for (var x = 0; x < 10; x++) {
+    for (var x = 0; x < this.props.boardSize; x++) {
       grid.push([])
-      for (var y = 0; y < 10; y++) {
+      for (var y = 0; y < this.props.boardSize; y++) {
         grid[x].push('')
       }
     }
@@ -23,8 +23,8 @@ class Board extends Component {
   }
 
   componentDidMount = () => {
-    for (var i = 0; i < 10; i++) {
-      for (var j = 0; j < 10; j++) {
+    for (var i = 0; i < this.props.boardSize; i++) {
+      for (var j = 0; j < this.props.boardSize; j++) {
         var newGrid = this.state.grid
         newGrid[i][j] = {square: <Square onClick={this.hit} coords = {{x: i, y: j}} isHit = {false} shipHere = {true}/>, shipHere: false};
         this.setState({
@@ -47,9 +47,9 @@ class Board extends Component {
   render() {
 
     var rows = [];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < this.props.boardSize; i++) {
       var row = [];
-      for (var j = 0; j< 10; j++) {
+      for (var j = 0; j< this.props.boardSize; j++) {
         row.push(this.state.grid[i][j].square)
       }
       rows.push(<div className = 'board-row'>{row}</div>);
