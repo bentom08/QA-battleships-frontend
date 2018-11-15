@@ -22,7 +22,7 @@ class App extends Component {
     return (
       <div>
       <Login user = {this.state.user} updateUser = {this.updateUser} port = {port} />
-      <Board/>
+      <Board boardSize = {10} playerBoard = {true} />
       </div>
     );
   }
