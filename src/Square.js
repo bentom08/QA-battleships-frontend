@@ -13,9 +13,9 @@ class Square extends Component {
 
   render() {
     var square;
-    if ((this.props.isHit && this.props.shipHere) || (this.props.shipHere && this.props.playerBoard)) {
+    if (this.props.isHit && this.props.shipHere) {
       square = <button id = 'sqaure' className='hit' onClick = {this.hit}></button>
-    } else if (this.props.isHit && !this.props.shipHere && !this.props.playerBoard) {
+    } else if ((this.props.isHit && !this.props.shipHere) || (this.props.shipHere && this.props.playerBoard)) {
       square = <button id = 'sqaure' className='miss' onClick = {this.hit}></button>
     } else {
       square = <button id = 'sqaure' className='sea' onClick = {this.hit}></button>

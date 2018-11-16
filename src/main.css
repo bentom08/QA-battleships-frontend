@@ -26,3 +26,8 @@
   content: "";
   display: table;
 }
+
+.board {
+  float: left;
+  margin: 100px;
+}
