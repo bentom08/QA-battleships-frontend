@@ -22,11 +22,11 @@ class Board extends Component {
     })
   }
 
-  resetBoard = () => {
+  resetBoard = (func) => {
     var newGrid = this.state.grid
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j < this.props.boardSize; j++) {
-        newGrid[i][j].square = <Square onClick={this.placeShip} coords = {{x: i, y: j}} isHit = {false} shipHere = {this.state.grid[i][j].shipConfirm} playerBoard = {this.props.playerBoard} />
+        newGrid[i][j].square = <Square onClick={func} coords = {{x: i, y: j}} isHit = {true} shipHere = {this.state.grid[i][j].shipConfirm} playerBoard = {this.props.playerBoard} />
         newGrid[i][j].shipHere = false
       }
     }
@@ -35,11 +35,11 @@ class Board extends Component {
     })
   }
 
-  clearShips = () => {
+  clearShips = (func) => {
     var newGrid = this.state.grid
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j < this.props.boardSize; j++) {
-        newGrid[i][j] = {square: <Square onClick={this.placeShip} coords = {{x: i, y: j}} isHit = {false} shipHere = {false} playerBoard = {this.props.playerBoard}/>, shipHere: false, shipConfirm: false, shipID: 0};
+        newGrid[i][j] = {square: <Square onClick={func} coords = {{x: i, y: j}} isHit = {true} shipHere = {false} playerBoard = {this.props.playerBoard}/>, shipHere: false, shipConfirm: false, shipID: 0};
       }
     }
     this.setState({
@@ -51,21 +51,139 @@ class Board extends Component {
 
   componentDidMount = () => {
     if (this.props.playerBoard) {
-      this.clearShips()
+      this.clearShips(this.placeShip)
     } else {
+      this.clearShips(this.hit)
+      for (var i = 0; i < this.state.shipsToPlace.length; i++) {
+        this.aiPlacement(i + 1)
+      }
+    }
+  }
 
-      axios.put("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/placeAIShips", initShipsToPlace).then((response) => {
-        var newGrid = this.state.grid
-        for (var i = 0; i < this.props.boardSize; i++) {
-          for (var j = 0; j < this.props.boardSize; j++) {
-            newGrid[i][j] = {square: <Square onClick={this.hit} coords = {{x: i, y: j}} isHit = {false} shipHere = {response.data[i][j]} playerBoard = {this.props.playerBoard}/>, shipHere: response.data[i][j], shipConfirm: response.data[i][j], shipID: 0};
-          }
-        }
+  aiDirection = (x, y, id) => {
+    var length = this.state.shipsToPlace[id - 1]
+    var newGrid = this.state.grid;
+    var i;
+
+    while(true) {
+      var direction = randInt(0, 4);
+
+			if (direction === 0) {
+
+				if (this.props.boardSize < y + length) {
+					continue;
+				}
+
+				for (i = 0; i < length; i++) {
+					if (this.state.grid[x][y + i].shipConfirm) {
+						return false;
+					}
+				}
+
+				for (i = 0; i < length; i++) {
+          newGrid[x][y + i].shipConfirm = true
+          newGrid[x][y + i].shipID = id
+				}
+
+        this.resetBoard(this.hit)
+
         this.setState({
           grid: newGrid
         })
-      })
 
+				break;
+
+      } else if (direction === 1) {
+
+  			if (y - length + 1 < 0) {
+  				continue;
+  			}
+
+  			for (i = 0; i < length; i++) {
+  				if (this.state.grid[x][y - i].shipConfirm) {
+  					return false;
+  				}
+  			}
+
+  			for (i = 0; i < length; i++) {
+          newGrid[x][y - i].shipConfirm = true
+          newGrid[x][y - i].shipID = id
+  			}
+
+        this.resetBoard(this.hit)
+
+        this.setState({
+          grid: newGrid
+        })
+
+  			break;
+
+      } else if (direction === 2) {
+
+  			if (x - length + 1 < 0) {
+  				continue;
+  			}
+
+  			for (i = 0; i < length; i++) {
+  				if (this.state.grid[x - i][y].shipConfirm) {
+  					return false;
+  				}
+  			}
+
+  			for (i = 0; i < length; i++) {
+          newGrid[x - i][y].shipConfirm = true
+          newGrid[x - i][y].shipID = id
+  			}
+
+        this.resetBoard(this.hit)
+
+        this.setState({
+          grid: newGrid
+        })
+
+  			break;
+
+      } else if (direction === 3) {
+
+  			if (this.props.boardSize < x + length) {
+  				continue;
+  			}
+
+  			for (i = 0; i < length; i++) {
+  				if (this.state.grid[x + i][y].shipConfirm) {
+  					return false;
+  				}
+  			}
+
+  			for (i = 0; i < length; i++) {
+          newGrid[x + i][y].shipConfirm = true
+          newGrid[x + i][y].shipID = id
+  			}
+
+        this.resetBoard(this.hit)
+
+        this.setState({
+          grid: newGrid
+        })
+
+  			break;
+      }
+    }
+
+    return true;
+  }
+
+  aiPlacement = (id) => {
+    var x;
+    var y;
+
+    var placed = false;
+
+    while(!placed) {
+      x = randInt(0, 10)
+      y = randInt(0, 10)
+      console.log(x, y, placed)
+      placed = this.aiDirection(x, y, id)
     }
   }
 
@@ -148,7 +266,7 @@ class Board extends Component {
     if (!shipsPlaced) {
       direction = 0
 
-      this.resetBoard()
+      this.resetBoard(this.placeShip)
       if (this.checkValidPlacement(x, y)) {
         this.renderShip(x, y, shipHere)
       }
@@ -161,7 +279,7 @@ class Board extends Component {
       direction = 0
     }
 
-    this.resetBoard()
+    this.resetBoard(this.placeShip)
     if (this.checkValidPlacement(x, y)) {
       this.renderShip(x, y, shipHere)
     }
