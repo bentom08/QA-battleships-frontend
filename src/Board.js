@@ -40,7 +40,7 @@ class Board extends Component {
     var newGrid = this.state.grid
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j < this.props.boardSize; j++) {
-        newGrid[i][j] = {square: <Square onClick={func} coords = {{x: i, y: j}} isHit = {false} shipHere = {false} playerBoard = {this.props.playerBoard}/>, shipHere: false, shipConfirm: false, shipID: 0, isHit: false};
+        newGrid[i][j] = {square: <Square onClick={func} coords = {{x: i, y: j}} isHit = {false} shipHere = {false} playerBoard = {this.props.playerBoard}/>, shipHere: false, shipConfirm: false, shipID: 0, isHit: false, shipSunk: false};
       }
     }
     this.setState({
@@ -184,7 +184,7 @@ class Board extends Component {
     while(!placed) {
       x = randInt(0, 10)
       y = randInt(0, 10)
-      
+
       placed = this.aiDirection(x, y, id)
     }
   }
