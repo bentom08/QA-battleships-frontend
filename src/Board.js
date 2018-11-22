@@ -18,7 +18,8 @@ class Board extends Component {
       grid: grid,
       shipsToPlace: initShipsToPlace.slice(),
       disableButtons: this.props.disableButtons,
-      message: ""
+      message: "",
+      startGame: ""
     })
   }
 
@@ -26,7 +27,7 @@ class Board extends Component {
     var newGrid = this.state.grid
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j < this.props.boardSize; j++) {
-        newGrid[i][j].square = <Square onClick={func} coords = {{x: i, y: j}} isHit = {true} shipHere = {this.state.grid[i][j].shipConfirm} playerBoard = {this.props.playerBoard} />
+        newGrid[i][j].square = <Square onClick={func} coords = {{x: i, y: j}} isHit = {this.state.grid[i][j].isHit} shipHere = {this.state.grid[i][j].shipConfirm} playerBoard = {this.props.playerBoard} />
         newGrid[i][j].shipHere = false
       }
     }
@@ -39,12 +40,13 @@ class Board extends Component {
     var newGrid = this.state.grid
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j < this.props.boardSize; j++) {
-        newGrid[i][j] = {square: <Square onClick={func} coords = {{x: i, y: j}} isHit = {true} shipHere = {false} playerBoard = {this.props.playerBoard}/>, shipHere: false, shipConfirm: false, shipID: 0};
+        newGrid[i][j] = {square: <Square onClick={func} coords = {{x: i, y: j}} isHit = {false} shipHere = {false} playerBoard = {this.props.playerBoard}/>, shipHere: false, shipConfirm: false, shipID: 0, isHit: false};
       }
     }
     this.setState({
       grid: newGrid,
-      shipsToPlace: initShipsToPlace.slice()
+      shipsToPlace: initShipsToPlace.slice(),
+      startGame: ""
     })
     currentShipID = 1
   }
@@ -182,7 +184,7 @@ class Board extends Component {
     while(!placed) {
       x = randInt(0, 10)
       y = randInt(0, 10)
-      console.log(x, y, placed)
+      
       placed = this.aiDirection(x, y, id)
     }
   }
@@ -307,19 +309,26 @@ class Board extends Component {
     })
 
     if (this.state.shipsToPlace.length === 0) {
-      this.props.startGame()
+      this.setState({
+        startGame: <button onClick = {() => this.props.startGame(this.state.grid)} >Start Game</button>
+      })
     }
 
     currentShipID++
   }
 
   hit = (x, y, shipHere) => {
+    console.log("test")
     if (!this.state.disableButtons) {
       var newGrid = this.state.grid
       newGrid[x][y].square = <Square onClick = {this.hit} coords = {{x: x, y: y}} isHit = {true} shipHere = {shipHere} />
+      newGrid[x][y].isHit = true
+
       this.setState({
         grid: newGrid
       })
+
+      this.props.takeTurn(true, shipHere)
     }
   }
 
@@ -327,6 +336,15 @@ class Board extends Component {
     this.setState({
       disableButtons: nextProps.disableButtons
     })
+
+    if (this.props.playerBoard) {
+      this.setState({
+        grid: nextProps.grid
+      })
+      this.resetBoard(this.placeShip)
+    }
+
+
   }
 
   render() {
@@ -342,7 +360,7 @@ class Board extends Component {
     var buttons;
     if (this.props.playerBoard === true) {
       buttons = <div><button onClick = {this.confirmPlacement}>Place Ship</button>
-                  <button onClick = {this.clearShips}>Clear All Ships</button></div>
+                  <button onClick = {() => this.clearShips(this.placeShip)}>Clear All Ships</button></div>
     }
 
     return (
@@ -350,6 +368,7 @@ class Board extends Component {
       {this.state.message}
       {rows}
       {buttons}
+      {this.state.startGame}
       </div>
     );
   }

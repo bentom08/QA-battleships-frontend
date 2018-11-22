@@ -3,6 +3,10 @@
 }
 
 .miss {
+  background-color: white
+}
+
+.ship {
   background-color: gray
 }
 

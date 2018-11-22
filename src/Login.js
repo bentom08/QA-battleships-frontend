@@ -184,7 +184,7 @@ class Login extends Component {
     </div>
 
     const loggedIn = <div>
-      You are currently logged in as {this.state.user}<br/>
+      <div>You are currently logged in as {this.state.user}</div><br/>
       <button id = 'signOut' onClick =  {this.signOut} >Sign Out</button>
       <button id = 'changePassword' onClick = {this.goToChangePassword}>Change Password</button><br/><br/>
       {this.state.usernameMsg}
