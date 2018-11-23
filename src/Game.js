@@ -3,6 +3,7 @@ import Board from './Board.js'
 
 var previousHit = [-1, -1]
 var direction;
+var turnsSinceHit = 0
 
 class Game extends Component {
   constructor(props) {
@@ -27,7 +28,7 @@ class Game extends Component {
     if (!player) {
       var newGrid = this.state.playerGrid
       var coords = this.aiMove()
-      console.log(coords[0], coords[1])
+      console.log(turnsSinceHit)
       newGrid[coords[0]][coords[1]].isHit = true
       shipHere = newGrid[coords[0]][coords[1]].shipConfirm
 
@@ -90,6 +91,8 @@ class Game extends Component {
       return this.mediumDiff()
     } else if (this.props.difficulty === 3) {
       return this.hardDiff()
+    } else if (this.props.difficulty === 4) {
+      return this.veryHardDiff()
     }
   }
 
@@ -114,6 +117,11 @@ class Game extends Component {
 
 		if (hitSquares.length === 0) {
 			coords = this.getRandomSquare();
+      if (this.state.playerGrid[coords[0]][coords[1]].shipConfirm) {
+        turnsSinceHit = 0
+      } else {
+        turnsSinceHit++
+      }
 			previousHit[0] = -1;
 		} else if (previousHit[0] !== -1) {
 			switch (direction) {
@@ -140,10 +148,10 @@ class Game extends Component {
 			var reverse = false;
 			var reverseNow;
 
-			try {
+			if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < this.props.boardSize && coords[1] < this.props.boardSize) {
 				reverse = !this.state.playerGrid[coords[0]][coords[1]].shipConfirm;
 				reverseNow = this.state.playerGrid[coords[0]][coords[1]].isHit;
-			} catch {
+			} else {
 				reverseNow = true;
 			}
 
@@ -153,7 +161,7 @@ class Game extends Component {
 
 			if (reverse || reverseNow) {
 
-				try {
+				if (nextHit[0] >= 0 && nextHit[1] >= 0 && nextHit[0] < this.props.boardSize && nextHit[1] < this.props.boardSize) {
 					while (this.state.playerGrid[nextHit[0]][nextHit[1]].isHit && this.state.playerGrid[nextHit[0]][nextHit[1]].shipConfirm) {
 						switch (direction) {
 							case 0:
@@ -172,7 +180,7 @@ class Game extends Component {
                 break;
 						}
 					}
-				} catch {
+				} else {
 					previousHit[0] = -1;
 					return this.getAdjacentSquare(hitSquares);
 				}
@@ -226,6 +234,26 @@ class Game extends Component {
 
   }
 
+  veryHardDiff = () => {
+    var whenToCheat = randInt(2, 5)
+    if (turnsSinceHit >= whenToCheat) {
+      var unHitShips = [];
+      for (var i = 0; i < this.props.boardSize; i++) {
+        for (var j = 0; j< this.props.boardSize; j++) {
+          if (this.state.playerGrid[i][j].shipConfirm && !this.state.playerGrid[i][j].isHit) {
+            unHitShips.push([i, j])
+          }
+        }
+      }
+
+      turnsSinceHit = 0
+      return unHitShips[randInt(0, unHitShips.length)]
+
+    } else {
+      return this.hardDiff()
+    }
+  }
+
   getAdjacentSquare = (hitSquares) => {
     var coords = [-1, -1]
     var i = randInt(0, hitSquares.length)
@@ -237,11 +265,11 @@ class Game extends Component {
           coords[0] = hitSquares[i][0] + 1
           coords[1] = hitSquares[i][1]
       } else if (direction === 1) {
-          coords[0] = hitSquares[i][0]
-          coords[1] = hitSquares[i][1] + 1
-      } else if (direction === 2) {
           coords[0] = hitSquares[i][0] - 1
           coords[1] = hitSquares[i][1]
+      } else if (direction === 2) {
+          coords[0] = hitSquares[i][0]
+          coords[1] = hitSquares[i][1] + 1
       } else {
           coords[0] = hitSquares[i][0]
           coords[1] = hitSquares[i][1] - 1
