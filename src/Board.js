@@ -336,6 +336,15 @@ class Board extends Component {
         shipSunk = false
       }
 
+      var gameOver = true
+      for (i = 0; i < this.props.boardSize; i++) {
+        for (var j = 0; j< this.props.boardSize; j++) {
+          if (!newGrid[i][j].isHit && newGrid[i][j].shipConfirm) {
+            gameOver = false
+          }
+        }
+      }
+
       if (shipSunk === true) {
         this.setState({
           message: "You Sunk a Ship!"
@@ -350,7 +359,7 @@ class Board extends Component {
         grid: newGrid
       })
 
-      this.props.takeTurn(true, shipHere)
+      this.props.takeTurn(true, shipHere, gameOver)
     }
   }
 

@@ -13,7 +13,9 @@ class Game extends Component {
       AITurn: true,
       playerCoords: [-1, -1],
       opponentCoords: [-1, -1],
-      playerGrid: ""
+      playerGrid: "",
+      gameOver: false,
+      gameOverMessage: ""
     }
   }
 
@@ -24,48 +26,72 @@ class Game extends Component {
     })
   }
 
-  takeTurn = (player, shipHere) => {
-    if (!player) {
-      var newGrid = this.state.playerGrid
-      var coords = this.aiMove()
-      console.log(turnsSinceHit)
-      newGrid[coords[0]][coords[1]].isHit = true
-      shipHere = newGrid[coords[0]][coords[1]].shipConfirm
+  takeTurn = (player, shipHere, gameOver) => {
+    if (gameOver) {
+      this.setState({
+        gameOver: true,
+        gameOverMessage: "You Win!"
+      })
+    }
 
-      var removeShip = true
-      if (shipHere === true) {
-        for (var i = 0; i < this.props.boardSize; i++) {
-          for (var j = 0; j< this.props.boardSize; j++) {
-            if (newGrid[i][j].shipID === newGrid[coords[0]][coords[1]].shipID && newGrid[i][j].isHit === false) {
-              removeShip = false
+    if (!this.state.gameOver) {
+      if (!player) {
+        var newGrid = this.state.playerGrid
+        var coords = this.aiMove()
+
+        newGrid[coords[0]][coords[1]].isHit = true
+        shipHere = newGrid[coords[0]][coords[1]].shipConfirm
+
+        var removeShip = true
+        if (shipHere === true) {
+          for (var i = 0; i < this.props.boardSize; i++) {
+            for (var j = 0; j< this.props.boardSize; j++) {
+              if (newGrid[i][j].shipID === newGrid[coords[0]][coords[1]].shipID && newGrid[i][j].isHit === false) {
+                removeShip = false
+              }
             }
           }
+        } else {
+          removeShip = false
         }
-      } else {
-        removeShip = false
+
+        this.setState({
+          playerGrid: newGrid
+        })
+
+        if (removeShip) {
+          this.sinkShip(newGrid[coords[0]][coords[1]].shipID)
+        }
+      }
+
+      var isAINext = false
+
+      if ((!player && shipHere) || (player && !shipHere)) {
+        isAINext = true
       }
 
       this.setState({
-        playerGrid: newGrid
+        AITurn: isAINext
       })
 
-      if (removeShip) {
-        this.sinkShip(newGrid[coords[0]][coords[1]].shipID)
+      if (isAINext) {
+        setTimeout(() => this.takeTurn(false, false, false), 1500)
+        gameOver = true
+        for (i = 0; i < this.props.boardSize; i++) {
+          for (var j = 0; j< this.props.boardSize; j++) {
+            if (!this.state.playerGrid[i][j].isHit && this.state.playerGrid[i][j].shipConfirm) {
+              gameOver = false
+            }
+          }
+        }
+
+        if (gameOver) {
+          this.setState({
+            gameOver: true,
+            gameOverMessage: "The Opponent Has Won!"
+          })
+        }
       }
-    }
-
-    var isAINext = false
-
-    if ((!player && shipHere) || (player && !shipHere)) {
-      isAINext = true
-    }
-
-    this.setState({
-      AITurn: isAINext
-    })
-
-    if (isAINext) {
-      setTimeout(() => this.takeTurn(false, false), 1500)
     }
   }
 
@@ -333,6 +359,7 @@ class Game extends Component {
     return (
       <div>
           <p>{this.state.message}</p>
+          <h2>{this.state.gameOverMessage}</h2>
           <Board playerBoard = {true} boardSize = {this.props.boardSize} port = {this.props.port} startGame = {this.startGame} takeTurn = {this.takeTurn} grid = {this.state.grid} />
           <Board playerBoard = {false} boardSize = {this.props.boardSize} port = {this.props.port} disableButtons =  {this.state.AITurn} takeTurn = {this.takeTurn} />
       </div>
