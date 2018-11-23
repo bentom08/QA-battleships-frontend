@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Board from './Board.js'
 
+var previousHit = [-1, -1]
+var direction;
+
 class Game extends Component {
   constructor(props) {
     super(props);
@@ -24,6 +27,7 @@ class Game extends Component {
     if (!player) {
       var newGrid = this.state.playerGrid
       var coords = this.aiMove()
+      console.log(coords[0], coords[1])
       newGrid[coords[0]][coords[1]].isHit = true
       shipHere = newGrid[coords[0]][coords[1]].shipConfirm
 
@@ -65,7 +69,7 @@ class Game extends Component {
   }
 
   sinkShip = (id) => {
-    var newGrid
+    var newGrid = this.state.playerGrid
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j< this.props.boardSize; j++) {
         if (this.state.playerGrid[i][j].shipID === id) {
@@ -97,18 +101,138 @@ class Game extends Component {
     var hitSquares = this.getUnsunkSquares()
 
     if (hitSquares.length === 0) {
+      previousHit[0] = -1;
       return this.getRandomSquare()
     } else {
       return this.getAdjacentSquare(hitSquares)
     }
   }
 
+  hardDiff = () => {
+    var hitSquares = this.getUnsunkSquares();
+    var coords = [-1, -1]
+
+		if (hitSquares.length === 0) {
+			coords = this.getRandomSquare();
+			previousHit[0] = -1;
+		} else if (previousHit[0] !== -1) {
+			switch (direction) {
+				case 0:
+					coords[0] = previousHit[0] + 1;
+					coords[1] = previousHit[1];
+					break;
+				case 1:
+					coords[0] = previousHit[0] - 1;
+					coords[1] = previousHit[1];
+					break;
+				case 2:
+					coords[0] = previousHit[0];
+					coords[1] = previousHit[1] + 1;
+					break;
+				case 3:
+					coords[0] = previousHit[0];
+					coords[1] = previousHit[1] - 1;
+					break;
+        default:
+          break;
+			}
+
+			var reverse = false;
+			var reverseNow;
+
+			try {
+				reverse = !this.state.playerGrid[coords[0]][coords[1]].shipConfirm;
+				reverseNow = this.state.playerGrid[coords[0]][coords[1]].isHit;
+			} catch {
+				reverseNow = true;
+			}
+
+			var nextHit = [previousHit[0], previousHit[1]];
+			previousHit[0] = coords[0];
+			previousHit[1] = coords[1];
+
+			if (reverse || reverseNow) {
+
+				try {
+					while (this.state.playerGrid[nextHit[0]][nextHit[1]].isHit && this.state.playerGrid[nextHit[0]][nextHit[1]].shipConfirm) {
+						switch (direction) {
+							case 0:
+								nextHit[0] -= 1;
+								break;
+							case 1:
+								nextHit[0] += 1;
+								break;
+							case 2:
+								nextHit[1] -= 1;
+								break;
+							case 3:
+								nextHit[1] += 1;
+								break;
+              default:
+                break;
+						}
+					}
+				} catch {
+					previousHit[0] = -1;
+					return this.getAdjacentSquare(hitSquares);
+				}
+
+				if (this.state.playerGrid[nextHit[0]][nextHit[1]].isHit) {
+					previousHit[0] = -1;
+					return coords;
+				}
+
+				if (reverseNow) {
+					coords[0] = nextHit[0];
+					coords[1] = nextHit[1];
+					previousHit[0] = coords[0];
+					previousHit[1] = coords[1];
+				}
+
+				switch (direction) {
+					case 0:
+						if (!reverseNow) {
+							previousHit[0] = nextHit[0] + 1;
+						}
+						direction = 1;
+						break;
+					case 1:
+						direction = 0;
+						if (!reverseNow) {
+							previousHit[0] = nextHit[0] - 1;
+						}
+						break;
+					case 2:
+						direction = 3;
+						if (!reverseNow) {
+							previousHit[1] = nextHit[1] + 1;
+						}
+						break;
+					case 3:
+						direction = 2;
+						if (!reverseNow) {
+							previousHit[1] = nextHit[1] - 1;
+						}
+						break;
+          default:
+            break;
+				}
+			}
+		} else {
+			coords = this.getAdjacentSquare(hitSquares);
+		}
+
+		return coords;
+
+  }
+
   getAdjacentSquare = (hitSquares) => {
     var coords = [-1, -1]
-    var i = 0
+    var i = randInt(0, hitSquares.length)
+    direction = randInt(0, 4)
+    var n = 0
+
     while (true) {
-      var direction = randInt(0, 4)
-      console.log(direction)
       if (direction === 0) {
           coords[0] = hitSquares[i][0] + 1
           coords[1] = hitSquares[i][1]
@@ -122,12 +246,31 @@ class Game extends Component {
           coords[0] = hitSquares[i][0]
           coords[1] = hitSquares[i][1] - 1
       }
-      console.log(coords)
 
       if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < this.props.boardSize && coords[1] < this.props.boardSize && !this.state.playerGrid[coords[0]][coords[1]].isHit) {
 				break;
-			}
-      break
+			} else {
+        direction++
+        n++
+      }
+
+      if (direction > 3) {
+        direction = 0
+      }
+
+      if (n === 4) {
+        i++
+        n = 0
+      }
+
+      if (i >= hitSquares.length) {
+        i = 0
+      }
+    }
+
+    if (this.state.playerGrid[coords[0]][coords[1]].shipConfirm) {
+      previousHit[0] = coords[0]
+      previousHit[1] = coords[1]
     }
 
     return coords
@@ -161,6 +304,7 @@ class Game extends Component {
   render() {
     return (
       <div>
+          <p>{this.state.message}</p>
           <Board playerBoard = {true} boardSize = {this.props.boardSize} port = {this.props.port} startGame = {this.startGame} takeTurn = {this.takeTurn} grid = {this.state.grid} />
           <Board playerBoard = {false} boardSize = {this.props.boardSize} port = {this.props.port} disableButtons =  {this.state.AITurn} takeTurn = {this.takeTurn} />
       </div>
@@ -171,14 +315,6 @@ class Game extends Component {
 function randInt(min , max) {
   let random_number = Math.random() * (max-min) + min;
   return Math.floor(random_number);
-}
-
-async function wait(ms) {
-  await sleep(ms)
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export default Game;

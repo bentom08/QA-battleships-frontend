@@ -318,11 +318,33 @@ class Board extends Component {
   }
 
   hit = (x, y, shipHere) => {
-    console.log("test")
     if (!this.state.disableButtons) {
       var newGrid = this.state.grid
       newGrid[x][y].square = <Square onClick = {this.hit} coords = {{x: x, y: y}} isHit = {true} shipHere = {shipHere} />
       newGrid[x][y].isHit = true
+
+      var shipSunk = true
+      if (shipHere) {
+        for (var i = 0; i < this.props.boardSize; i++) {
+          for (var j = 0; j< this.props.boardSize; j++) {
+            if (newGrid[i][j].shipID === newGrid[x][y].shipID && newGrid[i][j].isHit === false) {
+              shipSunk = false
+            }
+          }
+        }
+      } else {
+        shipSunk = false
+      }
+
+      if (shipSunk === true) {
+        this.setState({
+          message: "You Sunk a Ship!"
+        })
+      } else {
+        this.setState({
+          message: ""
+        })
+      }
 
       this.setState({
         grid: newGrid
@@ -365,21 +387,13 @@ class Board extends Component {
 
     return (
       <div className = 'board'>
-      {this.state.message}
       {rows}
       {buttons}
+      {this.state.message}
       {this.state.startGame}
       </div>
     );
   }
-}
-
-async function wait(ms) {
-  await sleep(ms)
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function twoDArray(size) {
