@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Board from './Board.js'
+import Timer from './Timer.js'
 
 var previousHit = [-1, -1]
 var direction;
@@ -361,6 +362,7 @@ class Game extends Component {
           <p>{this.state.message}</p>
           <h2>{this.state.gameOverMessage}</h2>
           <Board playerBoard = {true} boardSize = {this.props.boardSize} port = {this.props.port} startGame = {this.startGame} takeTurn = {this.takeTurn} grid = {this.state.grid} />
+          <Timer />
           <Board playerBoard = {false} boardSize = {this.props.boardSize} port = {this.props.port} disableButtons =  {this.state.AITurn} takeTurn = {this.takeTurn} />
       </div>
     )

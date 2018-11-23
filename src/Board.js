@@ -7,6 +7,7 @@ var direction;
 var currentShipID = 1
 var shipsPlaced = false
 var initShipsToPlace = [5, 4, 4, 3, 3, 2]
+var shipDown = false
 
 class Board extends Component {
   constructor(props) {
@@ -265,6 +266,7 @@ class Board extends Component {
   }
 
   placeShip = (x, y, shipHere) => {
+    shipDown = true
     if (!shipsPlaced) {
       direction = 0
 
@@ -288,33 +290,36 @@ class Board extends Component {
   }
 
   confirmPlacement = () => {
-    var newArray = this.state.shipsToPlace
-    newArray.splice(0, 1)
-    this.setState({
-      shipsToPlace: newArray
-    })
+    if (shipDown === true) {
+      var newArray = this.state.shipsToPlace
+      newArray.splice(0, 1)
+      this.setState({
+        shipsToPlace: newArray
+      })
 
-    var newGrid = this.state.grid
-    for (var i = 0; i < this.props.boardSize; i++) {
-      for (var j = 0; j < this.props.boardSize; j++) {
-        if (this.state.grid[i][j].shipConfirm === false && this.state.grid[i][j].shipHere === true) {
-          newGrid[i][j].shipConfirm = true
-          newGrid[i][j].shipID = currentShipID
+      var newGrid = this.state.grid
+      for (var i = 0; i < this.props.boardSize; i++) {
+        for (var j = 0; j < this.props.boardSize; j++) {
+          if (this.state.grid[i][j].shipConfirm === false && this.state.grid[i][j].shipHere === true) {
+            newGrid[i][j].shipConfirm = true
+            newGrid[i][j].shipID = currentShipID
+          }
         }
       }
-    }
 
-    this.setState({
-      grid: newGrid
-    })
-
-    if (this.state.shipsToPlace.length === 0) {
       this.setState({
-        startGame: <button onClick = {() => this.props.startGame(this.state.grid)} >Start Game</button>
+        grid: newGrid
       })
-    }
 
-    currentShipID++
+      if (this.state.shipsToPlace.length === 0) {
+        this.setState({
+          startGame: <button onClick = {() => this.props.startGame(this.state.grid)} >Start Game</button>
+        })
+      }
+
+      currentShipID++
+      shipDown = false
+    }
   }
 
   hit = (x, y, shipHere) => {
