@@ -28,10 +28,10 @@ class Login extends Component {
       })
       return;
     }
-    axios.get("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
+    axios.get("http://" + this.props.ip + ":" + this.props.port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
 
       if (response.data.response === "false") {
-        axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/addUser",
+        axios.post("http://"+ this.props.ip + ":" + this.props.port +"/battleships-1.0/api/battleships/addUser",
           {
             username: document.getElementById('username').value,
             password: document.getElementById('password').value
@@ -52,10 +52,10 @@ class Login extends Component {
   }
 
   login = () => {
-    axios.get("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
+    axios.get("http://" + this.props.ip + ":" + this.props.port +"/battleships-1.0/api/battleships/checkUsername/" + document.getElementById('username').value).then((response) => {
 
       if (response.data.response === "true") {
-        axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkPassword",
+        axios.post("http://" + this.props.ip + ":" + this.props.port +"/battleships-1.0/api/battleships/checkPassword",
           {
             username: document.getElementById('username').value,
             password: document.getElementById('password').value
@@ -88,7 +88,7 @@ class Login extends Component {
       })
       return;
     }
-    axios.post("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/checkPassword",
+    axios.post("http://" + this.props.ip + ":" + this.props.port +"/battleships-1.0/api/battleships/checkPassword",
         {
             username: this.props.user,
             password: document.getElementById('oldPass').value
@@ -99,7 +99,7 @@ class Login extends Component {
               usernameMsg: 'Incorrect Password'
             })
           } else {
-            axios.put("http://localhost:"+ this.props.port +"/battleships-1.0/api/battleships/updatePassword",
+            axios.put("http://"+ this.props.ip + ":" + this.props.port +"/battleships-1.0/api/battleships/updatePassword",
             {
               username: this.props.user,
               password: document.getElementById('password').value
