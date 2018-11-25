@@ -29,7 +29,7 @@ class Timer extends Component {
     const { status, runningTime } = this.state;
     return (
       <div className = "timer">
-        <b>{leftPad(Math.floor(runningTime/60000), 2)}:{leftPad(Math.floor(runningTime/1000), 2)}</b>
+        <b>{leftPad(Math.floor(runningTime/60000), 2)}:{leftPad(Math.floor((runningTime/1000)%60), 2)}</b>
       </div>
     );
   }

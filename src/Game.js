@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Board from './Board.js'
 import Timer from './Timer.js'
-import Stats from './Stats.js'
+import axios from 'axios'
 
 var previousHit = [-1, -1]
 var direction;
@@ -17,8 +17,16 @@ class Game extends Component {
       opponentCoords: [-1, -1],
       playerGrid: "",
       gameOver: false,
-      gameOverMessage: ""
+      gameOverMessage: "",
+      user: this.props.user,
+      difficulty: this.props.difficulty
     }
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.setState({
+      user: nextProps.user
+    })
   }
 
   startGame = (grid) => {
@@ -32,6 +40,40 @@ class Game extends Component {
 
   endGame = (playerWon) => {
     this.refs.timer.toggleTimer()
+
+    var aiHits = 0;
+    var aiMisses = 0;
+    var numberOfHits = 0;
+    var numberOfMisses = 0;
+    for (var i = 0; i < this.props.boardSize; i++) {
+      for (var j = 0; j < this.props.boardSize; j++) {
+        if (this.state.playerGrid[i][j].shipConfirm && this.state.playerGrid[i][j].isHit) {
+          aiHits++
+        } else if (!this.state.playerGrid[i][j].shipConfirm && this.state.playerGrid[i][j].isHit) {
+          aiMisses++
+        }
+
+        if (this.refs.aiBoard.state.grid[i][j].shipConfirm && this.refs.aiBoard.state.grid[i][j].isHit) {
+          numberOfHits++
+        } else if (!this.refs.aiBoard.state.grid[i][j].shipConfirm && this.refs.aiBoard.state.grid[i][j].isHit) {
+          numberOfMisses++
+        }
+      }
+    }
+
+    if (this.state.user !== '') {
+      axios.post("http://" + this.props.ip + ":" + this.props.port + "/battleships-1.0/api/battleships/addGame/" + this.state.user,
+      {
+        difficulty: this.state.difficulty,
+        aiHits: aiHits,
+        aiMisses: aiMisses,
+        numberOfHits: numberOfHits,
+        numberOfMisses: numberOfMisses,
+        boardSize: this.props.boardSize,
+        gameWon: playerWon,
+        time: Math.floor(this.refs.timer.state.runningTime/1000)
+      })
+    }
   }
 
   takeTurn = (player, shipHere, gameOver) => {
@@ -373,8 +415,7 @@ class Game extends Component {
           <h2>{this.state.gameOverMessage}</h2>
           <Timer ref = "timer" />
           <Board playerBoard = {true} boardSize = {this.props.boardSize} port = {this.props.port} startGame = {this.startGame} takeTurn = {this.takeTurn} grid = {this.state.grid} />
-          <Board playerBoard = {false} boardSize = {this.props.boardSize} port = {this.props.port} disableButtons =  {this.state.AITurn} takeTurn = {this.takeTurn} />
-          <Stats />
+          <Board ref = 'aiBoard' playerBoard = {false} boardSize = {this.props.boardSize} port = {this.props.port} disableButtons =  {this.state.AITurn} takeTurn = {this.takeTurn} />
       </div>
     )
   }
