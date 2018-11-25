@@ -36,7 +36,6 @@ class Game extends Component {
       AITurn: false,
       playerGrid: grid
     })
-    console.log(this.state.difficulty)
     difficulty = this.state.difficulty
     this.refs.timer.toggleTimer()
   }
@@ -444,6 +443,9 @@ class Game extends Component {
     this.refs.aiBoard.clearShips(this.refs.aiBoard.hit)
 
     this.refs.timer.handleReset()
+
+    previousHit = [-1, -1]
+    turnsSinceHit = 0
   }
 
   render() {
