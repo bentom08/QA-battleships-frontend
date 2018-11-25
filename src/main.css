@@ -35,3 +35,12 @@
   float: left;
   margin: 100px;
 }
+
+.timer {
+  padding-left: 26%;
+  font-size: 170%;
+}
+
+.login {
+  padding: 15px
+}

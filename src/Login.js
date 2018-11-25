@@ -113,6 +113,14 @@ class Login extends Component {
     })
   }
 
+  deleteUser = () => {
+    if (window.confirm("Warning: will delete all user data from database")) {
+      axios.delete("http://" + this.props.ip + ":" + this.props.port + "/battleships-1.0/api/battleships/deleteUser/" + this.props.user)
+    }
+
+    this.goToLogin()
+  }
+
   goToSignUp = () => {
     this.setState({
       signUp: true,
@@ -186,7 +194,8 @@ class Login extends Component {
     const loggedIn = <div>
       <div>You are currently logged in as {this.state.user}</div><br/>
       <button id = 'signOut' onClick =  {this.signOut} >Sign Out</button>
-      <button id = 'changePassword' onClick = {this.goToChangePassword}>Change Password</button><br/><br/>
+      <button id = 'changePassword' onClick = {this.goToChangePassword}>Change Password</button>
+      <button id = 'deleteUser' onClick = {this.deleteUser}>Delete Account</button><br/><br/>
       {this.state.usernameMsg}
       </div>
 
@@ -211,7 +220,9 @@ class Login extends Component {
     }
 
     return (
-      display
+      <div className = 'login'>
+      {display}
+      </div>
     );
   }
 }

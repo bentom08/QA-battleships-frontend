@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Board from './Board.js'
 import Timer from './Timer.js'
+import Stats from './Stats.js'
 
 var previousHit = [-1, -1]
 var direction;
@@ -25,6 +26,12 @@ class Game extends Component {
       AITurn: false,
       playerGrid: grid
     })
+
+    this.refs.timer.toggleTimer()
+  }
+
+  endGame = (playerWon) => {
+    this.refs.timer.toggleTimer()
   }
 
   takeTurn = (player, shipHere, gameOver) => {
@@ -33,6 +40,7 @@ class Game extends Component {
         gameOver: true,
         gameOverMessage: "You Win!"
       })
+      this.endGame(true)
     }
 
     if (!this.state.gameOver) {
@@ -91,6 +99,7 @@ class Game extends Component {
             gameOver: true,
             gameOverMessage: "The Opponent Has Won!"
           })
+          this.endGame(false)
         }
       }
     }
@@ -175,6 +184,7 @@ class Game extends Component {
 			var reverse = false;
 			var reverseNow;
 
+
 			if (coords[0] >= 0 && coords[1] >= 0 && coords[0] < this.props.boardSize && coords[1] < this.props.boardSize) {
 				reverse = !this.state.playerGrid[coords[0]][coords[1]].shipConfirm;
 				reverseNow = this.state.playerGrid[coords[0]][coords[1]].isHit;
@@ -188,7 +198,7 @@ class Game extends Component {
 
 			if (reverse || reverseNow) {
 
-				if (nextHit[0] >= 0 && nextHit[1] >= 0 && nextHit[0] < this.props.boardSize && nextHit[1] < this.props.boardSize) {
+				try {
 					while (this.state.playerGrid[nextHit[0]][nextHit[1]].isHit && this.state.playerGrid[nextHit[0]][nextHit[1]].shipConfirm) {
 						switch (direction) {
 							case 0:
@@ -207,7 +217,7 @@ class Game extends Component {
                 break;
 						}
 					}
-				} else {
+				} catch {
 					previousHit[0] = -1;
 					return this.getAdjacentSquare(hitSquares);
 				}
@@ -358,12 +368,13 @@ class Game extends Component {
 
   render() {
     return (
-      <div>
+      <div className = 'centered'>
           <p>{this.state.message}</p>
           <h2>{this.state.gameOverMessage}</h2>
+          <Timer ref = "timer" />
           <Board playerBoard = {true} boardSize = {this.props.boardSize} port = {this.props.port} startGame = {this.startGame} takeTurn = {this.takeTurn} grid = {this.state.grid} />
-          <Timer />
           <Board playerBoard = {false} boardSize = {this.props.boardSize} port = {this.props.port} disableButtons =  {this.state.AITurn} takeTurn = {this.takeTurn} />
+          <Stats />
       </div>
     )
   }

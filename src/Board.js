@@ -194,7 +194,7 @@ class Board extends Component {
     var invalidPlacement = true
     var n = 1
     while (invalidPlacement) {
-      if (n === 4) {
+      if (n === 8) {
         return false
       }
       n++
@@ -423,9 +423,9 @@ function twoDArray(size) {
   return array;
 }
 
-  function randInt(min , max) {
-    let random_number = Math.random() * (max-min) + min;
-    return Math.floor(random_number);
-  }
+function randInt(min , max) {
+  let random_number = Math.random() * (max-min) + min;
+  return Math.floor(random_number);
+}
 
 export default Board;
