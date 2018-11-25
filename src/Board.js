@@ -29,7 +29,7 @@ class Board extends Component {
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j < this.props.boardSize; j++) {
         newGrid[i][j].square = <Square onClick={func} coords = {{x: i, y: j}} isHit = {this.state.grid[i][j].isHit} shipHere = {this.state.grid[i][j].shipConfirm} playerBoard = {this.props.playerBoard} />
-        newGrid[i][j].shipHere = false
+        newGrid[i][j].tempShip = false
       }
     }
     this.setState({
@@ -41,7 +41,7 @@ class Board extends Component {
     var newGrid = this.state.grid
     for (var i = 0; i < this.props.boardSize; i++) {
       for (var j = 0; j < this.props.boardSize; j++) {
-        newGrid[i][j] = {square: <Square onClick={func} coords = {{x: i, y: j}} isHit = {false} shipHere = {false} playerBoard = {this.props.playerBoard}/>, shipHere: false, shipConfirm: false, shipID: 0, isHit: false, shipSunk: false};
+        newGrid[i][j] = {square: <Square onClick={func} coords = {{x: i, y: j}} isHit = {false} shipHere = {false} playerBoard = {this.props.playerBoard}/>, tempShip: false, shipConfirm: false, shipID: 0, isHit: false, shipSunk: false};
       }
     }
     this.setState({
@@ -246,16 +246,16 @@ class Board extends Component {
     for (var i = 0; i < this.state.shipsToPlace[0]; i++) {
       if (direction === 0) {
         newGrid[x + i][y].square = <Square onClick = {this.placeShip} coords = {{x: x + i, y: y}} isHit = {false} shipHere = {true} playerBoard = {this.props.playerBoard} />
-        newGrid[x + i][y].shipHere = true
+        newGrid[x + i][y].tempShip = true
       } else if (direction === 1) {
         newGrid[x][y + i].square = <Square onClick = {this.placeShip} coords = {{x: x, y: y + i}} isHit = {false} shipHere = {true} playerBoard = {this.props.playerBoard} />
-        newGrid[x][y + i].shipHere = true
+        newGrid[x][y + i].tempShip = true
       } else if (direction === 2) {
         newGrid[x - i][y].square = <Square onClick = {this.placeShip} coords = {{x: x - i, y: y}} isHit = {false} shipHere = {true} playerBoard = {this.props.playerBoard} />
-        newGrid[x - i][y].shipHere = true
+        newGrid[x - i][y].tempShip = true
       } else if (direction === 3) {
         newGrid[x][y - i].square = <Square onClick = {this.placeShip} coords = {{x: x, y: y - i}} isHit = {false} shipHere = {true} playerBoard = {this.props.playerBoard} />
-        newGrid[x][y - i].shipHere = true
+        newGrid[x][y - i].tempShip = true
       }
 
       newGrid[x][y].square = <Square onClick = {this.changeDirection} coords = {{x: x, y: y}} isHit = {false} shipHere = {true} playerBoard = {this.props.playerBoard} />
@@ -300,7 +300,7 @@ class Board extends Component {
       var newGrid = this.state.grid
       for (var i = 0; i < this.props.boardSize; i++) {
         for (var j = 0; j < this.props.boardSize; j++) {
-          if (this.state.grid[i][j].shipConfirm === false && this.state.grid[i][j].shipHere === true) {
+          if (this.state.grid[i][j].shipConfirm === false && this.state.grid[i][j].tempShip === true) {
             newGrid[i][j].shipConfirm = true
             newGrid[i][j].shipID = currentShipID
           }

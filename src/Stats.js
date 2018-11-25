@@ -18,7 +18,6 @@ class Stats extends Component {
   }
 
   getAllStats = () => {
-    console.log("http://" + this.props.ip + ":" + this.props.port + "/battleships-1.0/api/battleships/getAllGames")
     axios.get("http://" + this.props.ip + ":" + this.props.port + "/battleships-1.0/api/battleships/getAllGames").then( (response) => {
       this.setState({
         aiStats: eval(response.data)
@@ -87,7 +86,6 @@ class Stats extends Component {
       }
     }
 
-    console.log(games.length, wins)
     row.push(<td>{((wins/games.length)*100).toFixed(2) + '%'}</td>)
     row.push(<td>{(hits/games.length).toFixed(2)}</td>)
     row.push(<td>{(misses/games.length).toFixed(2)}</td>)
@@ -186,7 +184,7 @@ class Stats extends Component {
 }
 
 function formatTime(time) {
-  return leftPad(Math.floor(time/60), 2) + ':' + Math.floor(leftPad(time%60, 2))
+  return leftPad(Math.floor(time/60), 2) + ':' + leftPad(Math.floor(time%60), 2)
 }
 
 function leftPad(number, targetLength) {

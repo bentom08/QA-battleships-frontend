@@ -6,6 +6,8 @@ import axios from 'axios'
 var previousHit = [-1, -1]
 var direction;
 var turnsSinceHit = 0
+var difficulty = 3
+var initShipsToPlace = [5, 4, 4, 3, 3, 2]
 
 class Game extends Component {
   constructor(props) {
@@ -19,7 +21,7 @@ class Game extends Component {
       gameOver: false,
       gameOverMessage: "",
       user: this.props.user,
-      difficulty: this.props.difficulty
+      difficulty: 3
     }
   }
 
@@ -34,7 +36,8 @@ class Game extends Component {
       AITurn: false,
       playerGrid: grid
     })
-
+    console.log(this.state.difficulty)
+    difficulty = this.state.difficulty
     this.refs.timer.toggleTimer()
   }
 
@@ -64,7 +67,7 @@ class Game extends Component {
     if (this.state.user !== '') {
       axios.post("http://" + this.props.ip + ":" + this.props.port + "/battleships-1.0/api/battleships/addGame/" + this.state.user,
       {
-        difficulty: this.state.difficulty,
+        difficulty: difficulty,
         aiHits: aiHits,
         aiMisses: aiMisses,
         numberOfHits: numberOfHits,
@@ -163,13 +166,13 @@ class Game extends Component {
   }
 
   aiMove = () => {
-    if (this.props.difficulty === 1) {
+    if (difficulty === 1) {
       return this.easyDiff()
-    } else if (this.props.difficulty === 2) {
+    } else if (difficulty === 2) {
       return this.mediumDiff()
-    } else if (this.props.difficulty === 3) {
+    } else if (difficulty === 3) {
       return this.hardDiff()
-    } else if (this.props.difficulty === 4) {
+    } else if (difficulty === 4) {
       return this.veryHardDiff()
     }
   }
@@ -408,13 +411,59 @@ class Game extends Component {
 		return coords;
 	}
 
+  setDiff = (diff) => {
+    this.setState({
+      difficulty: diff
+    })
+  }
+
+  playAgain = () => {
+    this.setState({
+      AITurn: true,
+      playerCoords: [-1, -1],
+      opponentCoords: [-1, -1],
+      playerGrid: "",
+      gameOver: false,
+      gameOverMessage: ""
+    })
+
+    this.refs.playerBoard.setState({
+      shipsToPlace: initShipsToPlace.slice(),
+      message: "",
+      startGame: ""
+    })
+
+    this.refs.playerBoard.clearShips(this.refs.playerBoard.placeShip)
+
+    this.refs.aiBoard.setState({
+      shipsToPlace: initShipsToPlace.slice(),
+      message: "",
+      startGame: ""
+    })
+
+    this.refs.aiBoard.clearShips(this.refs.aiBoard.hit)
+
+    this.refs.timer.handleReset()
+  }
+
   render() {
+    var playAgain;
+    if (this.state.gameOver) {
+      playAgain = <button onClick = {this.playAgain}>Play Again?</button>
+    }
+
     return (
       <div className = 'centered'>
+          Difficulty:<br/><br/>
+            <input type = 'radio' name = 'diff' value = 'Very Easy' onChange = {() => this.setDiff(1)} /> Very Easy <br/>
+            <input type = 'radio' name = 'diff' value = 'Easy' onChange = {() => this.setDiff(2)} /> Easy <br/>
+            <input type = 'radio' name = 'diff' value = 'Medium' defaultChecked onChange = {() => this.setDiff(3)} /> Medium <br/>
+            <input type = 'radio' name = 'diff' value = 'Hard' onChange = {() => this.setDiff(4)} /> Hard
           <p>{this.state.message}</p>
           <h2>{this.state.gameOverMessage}</h2>
           <Timer ref = "timer" />
-          <Board playerBoard = {true} boardSize = {this.props.boardSize} port = {this.props.port} startGame = {this.startGame} takeTurn = {this.takeTurn} grid = {this.state.grid} />
+          {playAgain}
+          <Board ref = 'playerBoard' playerBoard = {true} boardSize = {this.props.boardSize} port = {this.props.port} startGame = {this.startGame} takeTurn = {this.takeTurn} grid = {this.state.grid} />
           <Board ref = 'aiBoard' playerBoard = {false} boardSize = {this.props.boardSize} port = {this.props.port} disableButtons =  {this.state.AITurn} takeTurn = {this.takeTurn} />
       </div>
     )

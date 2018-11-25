@@ -114,7 +114,7 @@ class Login extends Component {
   }
 
   deleteUser = () => {
-    if (window.confirm("Warning: will delete all user data from database")) {
+    if (window.confirm("Are you sure you want to delete your account? This will prevent you from accessing your statistics across all games")) {
       axios.delete("http://" + this.props.ip + ":" + this.props.port + "/battleships-1.0/api/battleships/deleteUser/" + this.props.user)
     }
 
