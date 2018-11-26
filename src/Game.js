@@ -441,7 +441,9 @@ class Game extends Component {
     })
 
     this.refs.aiBoard.clearShips(this.refs.aiBoard.hit)
-
+    for (var i = 0; i < this.refs.aiBoard.state.shipsToPlace.length; i++) {
+        this.refs.aiBoard.aiPlacement(i + 1)
+      }
     this.refs.timer.handleReset()
 
     previousHit = [-1, -1]

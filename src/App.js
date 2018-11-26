@@ -4,7 +4,7 @@ import Game from './Game.js'
 import Stats from './Stats.js'
 
 const port = 8080;
-const ip = "localhost"
+const ip = "35.228.4.244"
 
 class App extends Component {
   constructor(props) {
